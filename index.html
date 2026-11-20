@@ -323,7 +323,7 @@ function home(){
     ${boxHtml()}
     <div class="row"><button class="go" id="go" type="button">ทำนายฝัน</button>
       <span class="hint">พิมพ์หรือกดไมค์แล้วพูดก็ได้ เล่าสั้นหรือยาวก็ได้</span></div>
-    <p class="hint" style="margin-top:10px">ในหน้านี้ ความฝันของคุณจะถูกส่งให้ AI (Claude) อ่านผ่านบัญชีของคุณเอง</p>
+    <p class="hint" style="margin-top:10px">${window.claude ? 'ในหน้านี้ ความฝันของคุณจะถูกส่งให้ AI (Claude) อ่านผ่านบัญชีของคุณเอง' : 'ความฝันของคุณอ่านในเครื่องนี้เท่านั้น ไม่ถูกส่งหรือเก็บไว้ที่ไหน (ถ้ากดไมค์ เสียงจะส่งให้ระบบฟังเสียงของเบราว์เซอร์แปลงเป็นตัวหนังสือ)'}</p>
     <div id="err" class="err" role="alert"></div>
     <div class="row hint">ลองดูตัวอย่าง:
       <button class="try" type="button">ฝันเห็นงูสีเขียวตัวใหญ่เลื้อยเข้าบ้าน</button>
