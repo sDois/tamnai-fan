@@ -109,10 +109,11 @@ section > h2 + .meta{margin-bottom:16px;max-width:60ch}
 .ph-title{margin:28px 0 4px;font-size:32px}
 .shot{position:relative;display:block;width:fit-content;max-width:100%;margin:16px 0 8px;border-radius:12px;overflow:hidden}
 .shot img{display:block;max-width:100%;max-height:75vh;border-radius:12px}
-.dbox{position:absolute;border:2px solid #f2c94cdd;border-radius:6px;display:grid;place-items:center}
-.dbox.low{border-style:dashed;border-color:#ffffffaa}
-.dbox em{font-style:normal;font-weight:700;line-height:1;color:#f2c94c;opacity:.92;-webkit-text-stroke:2px #1d2563;paint-order:stroke fill;text-shadow:0 2px 8px #000a;font-variant-numeric:tabular-nums}
-.dbox.low em{color:#fff;opacity:.8}
+/* digits must read on light bark and dark wood alike: solid fill, thick dark outline, dark halo */
+.dbox{position:absolute;border:3px solid #f2c94c;border-radius:6px;display:grid;place-items:center;box-shadow:0 0 0 1px #000c,inset 0 0 0 1px #000c}
+.dbox.low{border-style:dashed;border-color:#fff}
+.dbox em{font-style:normal;font-weight:700;line-height:1;color:#f2c94c;-webkit-text-stroke:4px #10143a;paint-order:stroke fill;text-shadow:0 0 6px #000,0 2px 12px #000c;font-variant-numeric:tabular-nums}
+.dbox.low em{color:#fff}
 .ph-res{padding:24px 0 0;border-top:0}
 .digits{list-style:none;margin:8px 0 0;padding:0}
 .digits li{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
