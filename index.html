@@ -698,13 +698,16 @@ async function startPhoto(file){
   photo.url = URL.createObjectURL(photo.blob); photo.res = null; photo.err = ''; photo.busy = false;
   photoView(); try { window.scrollTo(0, 0); } catch (e) {}
 }
-async function openCamera(){
-  const msg = 'ถ่ายรูปขอเลขใช้ได้ในหน้า Claude เท่านั้น เพราะต้องให้ AI อ่านรูป';
-  if (!(await canSeeImages())){ const e = $('#err'); if (e) e.textContent = msg; return; }
+// Open the picker in the same tap (no await before it): phones only open the camera straight from a tap.
+function openCamera(){
+  const e = $('#err');
+  if (!SAMPLE){ if (e) e.textContent = 'ถ่ายรูปขอเลขใช้ได้ในหน้า Claude เท่านั้น เพราะต้องให้ AI อ่านรูป'; return; }
+  if (e) e.textContent = 'ถ้ากดแล้วกล้องไม่ขึ้น (เช่น ในแอป Claude) ให้เปิดหน้านี้ในเบราว์เซอร์ เช่น Chrome หรือ Safari แล้วกดอีกครั้ง';
   $('#camfile')?.click();
 }
-function readPhoto(){
+async function readPhoto(){
   if (!photo.blob || !photo.kind || photo.busy) return;
+  if (!(await canSeeImages())){ photo.err = 'หน้านี้ยังให้ AI ดูรูปไม่ได้ ลองเปิดในเบราว์เซอร์ เช่น Chrome หรือ Safari'; photoView(); return; }
   const kind = (PHOTO_KINDS.find(k => k[0] === photo.kind) || ['', 'รูปทั่วไป'])[1];
   const prompt = [
     'A Thai user took this photo to look for lucky-number shapes (ขอเลข), a folk belief. What the photo shows, per the user: ' + kind + '.',
