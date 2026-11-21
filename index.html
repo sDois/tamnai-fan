@@ -107,11 +107,12 @@ section > h2 + .meta{margin-bottom:16px;max-width:60ch}
 .ghost{border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:10px 20px;min-height:48px;cursor:pointer;font-size:17px}
 .photo{padding-bottom:20px}
 .ph-title{margin:28px 0 4px;font-size:32px}
-.shot{position:relative;display:inline-block;max-width:100%;margin:16px 0 8px;border-radius:12px;overflow:visible}
-.shot img{display:block;max-width:100%;max-height:70vh;border-radius:12px}
-.dbox{position:absolute;border:3px solid #f2c94c;border-radius:6px;box-shadow:0 0 0 1px #0008}
-.dbox.low{border-style:dashed;border-color:#ffffffcc}
-.dbox em{position:absolute;left:-3px;top:-3px;transform:translateY(-100%);background:#f2c94c;color:#1d2563;font-style:normal;font-weight:700;padding:0 7px;border-radius:5px;font-size:16px;line-height:1.5}
+.shot{position:relative;display:block;width:fit-content;max-width:100%;margin:16px 0 8px;border-radius:12px;overflow:hidden}
+.shot img{display:block;max-width:100%;max-height:75vh;border-radius:12px}
+.dbox{position:absolute;border:2px solid #f2c94cdd;border-radius:6px;display:grid;place-items:center}
+.dbox.low{border-style:dashed;border-color:#ffffffaa}
+.dbox em{font-style:normal;font-weight:700;line-height:1;color:#f2c94c;opacity:.92;-webkit-text-stroke:2px #1d2563;paint-order:stroke fill;text-shadow:0 2px 8px #000a;font-variant-numeric:tabular-nums}
+.dbox.low em{color:#fff;opacity:.8}
 .ph-res{padding:24px 0 0;border-top:0}
 .digits{list-style:none;margin:8px 0 0;padding:0}
 .digits li{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
@@ -661,9 +662,20 @@ function photoDigits(){
   const r = photo.res;
   return (r && Array.isArray(r.digits) ? r.digits : []).slice(0, 6)
     .filter(d => d && /^[0-9]$/.test(String(d.digit)) && Array.isArray(d.box) && d.box.length === 4)
-    .map(d => ({ digit:String(d.digit), conf:['high','medium','low'].includes(d.confidence) ? d.confidence : 'low', what:String(d.looks_like_th || ''),
-      x:clamp01(d.box[0]), y:clamp01(d.box[1]), w:clamp01(d.box[2]), h:clamp01(d.box[3]) }));
+    .map(d => { const x = clamp01(d.box[0]), y = clamp01(d.box[1]);
+      // keep every box inside the photo
+      return { digit:String(d.digit), conf:['high','medium','low'].includes(d.confidence) ? d.confidence : 'low', what:String(d.looks_like_th || ''),
+        x, y, w:Math.min(clamp01(d.box[2]), 1 - x), h:Math.min(clamp01(d.box[3]), 1 - y) }; })
+    .filter(d => d.w > 0.01 && d.h > 0.01);
 }
+// Write each digit large inside its box, sized to the box, so it is clear which shape was read.
+function sizeDigits(){
+  document.querySelectorAll('.dbox').forEach(b => {
+    const em = b.querySelector('em'); if (!em) return;
+    em.style.fontSize = Math.round(Math.max(18, Math.min(160, b.clientHeight * 0.8, b.clientWidth * 1.4))) + 'px';
+  });
+}
+window.addEventListener('resize', () => { if (document.querySelector('.dbox')) sizeDigits(); });
 const CONF_TH = { high:'เห็นชัด', medium:'พอเห็น', low:'เลือนๆ' };
 function photoView(){
   const ds = photoDigits();
@@ -691,6 +703,7 @@ function photoView(){
       ${foot()}
     </div>`;
   wirePhoto();
+  const im = $('.shot img'); if (im){ if (im.complete) sizeDigits(); else im.addEventListener('load', sizeDigits); }
 }
 async function startPhoto(file){
   try { photo.blob = await shrink(file); } catch (e) { photo.err = 'เปิดรูปนี้ไม่ได้ ลองเลือกรูปอื่น'; photoView(); return; }
