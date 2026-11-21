@@ -109,11 +109,14 @@ section > h2 + .meta{margin-bottom:16px;max-width:60ch}
 .ph-title{margin:28px 0 4px;font-size:32px}
 .shot{position:relative;display:block;width:fit-content;max-width:100%;margin:16px 0 8px;border-radius:12px;overflow:hidden}
 .shot img{display:block;max-width:100%;max-height:75vh;border-radius:12px}
-/* digits must read on light bark and dark wood alike: solid fill, thick dark outline, dark halo */
-.dbox{position:absolute;border:3px solid #f2c94c;border-radius:6px;display:grid;place-items:center;box-shadow:0 0 0 1px #000c,inset 0 0 0 1px #000c}
-.dbox.low{border-style:dashed;border-color:#fff}
-.dbox em{font-style:normal;font-weight:700;line-height:1;color:#f2c94c;-webkit-text-stroke:4px #10143a;paint-order:stroke fill;text-shadow:0 0 6px #000,0 2px 12px #000c;font-variant-numeric:tabular-nums}
-.dbox.low em{color:#fff}
+/* see-through digits laid over the shape, so the eye can follow the pattern underneath (ดอย 2026-11-21);
+   a thin dark edge keeps them findable on light bark; tap the photo to hide/show them */
+.shot{cursor:pointer}
+.dbox{position:absolute;border:1.5px dashed #ffffffb3;border-radius:6px;display:grid;place-items:center;box-shadow:0 0 0 1px #0006}
+.dbox em{font-style:normal;font-weight:700;line-height:1;color:#f2c94c66;-webkit-text-stroke:1.5px #10143acc;paint-order:stroke fill;font-variant-numeric:tabular-nums}
+.dbox.low em{color:#ffffff4d;-webkit-text-stroke-color:#10143a99}
+.shot.bare .dbox{display:none}
+.shot-hint{font-size:14px;color:var(--muted);margin:0 0 8px}
 .ph-res{padding:24px 0 0;border-top:0}
 .digits{list-style:none;margin:8px 0 0;padding:0}
 .digits li{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
@@ -688,7 +691,8 @@ function photoView(){
     <div class="wrap photo">
       <h1 class="ph-title">ขอเลขจากรูป</h1>
       <p class="meta">เลือกว่าเป็นรูปอะไร แล้วกด "อ่านเลขในรูป" AI จะวงตรงที่เห็นเป็นตัวเลขให้ดู</p>
-      ${photo.url ? `<div class="shot"><img src="${photo.url}" alt="รูปที่คุณเลือก">${ds.map(d => `<span class="dbox ${d.conf}" style="left:${d.x*100}%;top:${d.y*100}%;width:${d.w*100}%;height:${d.h*100}%"><em>${d.digit}</em></span>`).join('')}</div>` : ''}
+      ${photo.url ? `<div class="shot"><img src="${photo.url}" alt="รูปที่คุณเลือก">${ds.map(d => `<span class="dbox ${d.conf}" style="left:${d.x*100}%;top:${d.y*100}%;width:${d.w*100}%;height:${d.h*100}%"><em>${d.digit}</em></span>`).join('')}</div>
+        ${ds.length ? '<p class="shot-hint">แตะที่รูปเพื่อซ่อนหรือแสดงตัวเลข</p>' : ''}` : ''}
       <div class="q" style="font-weight:600;margin-top:8px">รูปนี้คืออะไร</div>
       <div class="pick">${PHOTO_KINDS.map(([k, t]) => `<button type="button" data-kind="${k}" aria-pressed="${photo.kind === k}">${t}</button>`).join('')}</div>
       <div class="row"><button class="go" id="readphoto" type="button" ${!photo.kind || photo.busy ? 'disabled' : ''}>${photo.busy ? 'กำลังอ่านรูป...' : 'อ่านเลขในรูป'}</button>
@@ -745,6 +749,7 @@ function wirePhoto(){
   document.querySelectorAll('a.mark').forEach(a => a.addEventListener('click', e => { e.preventDefault(); state.text = ''; home(); }));
   document.querySelectorAll('[data-kind]').forEach(b => b.addEventListener('click', () => { photo.kind = b.dataset.kind; photoView(); }));
   $('#readphoto')?.addEventListener('click', readPhoto);
+  $('.shot')?.addEventListener('click', e => e.currentTarget.classList.toggle('bare'));
   $('#repick')?.addEventListener('click', () => $('#camfile')?.click());
   $('#camfile')?.addEventListener('change', e => { const f = e.target.files && e.target.files[0]; if (f) startPhoto(f); });
 }
